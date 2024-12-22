@@ -1,0 +1,97 @@
+{% extends "employees/base.html" %}
+{% block title %}Uçak Montajı{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Yeni Uçak Montajı</h2>
+    <!-- ...existing messages display code... -->
+    <form method="post" class="card p-4" id="assembleForm" onsubmit="return validateStock(event)">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="aircraft_type">Uçak Tipi</label>
+            <select id="aircraft_type" name="aircraft_type" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="TB2">TB2</option>
+                <option value="TB3">TB3</option>
+                <option value="AKINCI">AKINCI</option>
+                <option value="KIZILELMA">KIZILELMA</option>
+            </select>
+        </div>
+        <div class="form-group mb-3">
+            <label for="kanat_qty">Kanat Adedi</label>
+            <input type="number" name="kanat_qty" min="1" value="1" class="form-control" required>
+        </div>
+        <div class="form-group mb-1">
+            <small id="stock-kanat" class="text-muted"></small>
+        </div>
+        <div class="form-group mb-3">
+            <label for="govde_qty">Gövde Adedi</label>
+            <input type="number" name="govde_qty" min="1" value="1" class="form-control" required>
+        </div>
+        <div class="form-group mb-1">
+            <small id="stock-govde" class="text-muted"></small>
+        </div>
+        <div class="form-group mb-3">
+            <label for="kuyruk_qty">Kuyruk Adedi</label>
+            <input type="number" name="kuyruk_qty" min="1" value="1" class="form-control" required>
+        </div>
+        <div class="form-group mb-1">
+            <small id="stock-kuyruk" class="text-muted"></small>
+        </div>
+        <div class="form-group mb-3">
+            <label for="aviyonik_qty">Aviyonik Adedi</label>
+            <input type="number" name="aviyonik_qty" min="1" value="1" class="form-control" required>
+        </div>
+        <div class="form-group mb-3">
+            <small id="stock-aviyonik" class="text-muted"></small>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Montaj Başlat</button>
+    </form>
+</div>
+<script>
+    const stockData = JSON.parse('{{ stock_json|safe }}');
+    const aircraftSelect = document.getElementById('aircraft_type');
+
+    function updateStock() {
+        const selected = aircraftSelect.value || '';
+        document.getElementById('stock-kanat').innerText =
+            selected && stockData[selected] ? `Kanat stok: ${stockData[selected].KANAT}` : '';
+        document.getElementById('stock-govde').innerText =
+            selected && stockData[selected] ? `Gövde stok: ${stockData[selected].GOVDE}` : '';
+        document.getElementById('stock-kuyruk').innerText =
+            selected && stockData[selected] ? `Kuyruk stok: ${stockData[selected].KUYRUK}` : '';
+        document.getElementById('stock-aviyonik').innerText =
+            selected && stockData[selected] ? `Aviyonik stok: ${stockData[selected].AVIYONIK}` : '';
+    }
+
+    function validateStock(event) {
+        event.preventDefault();
+        const selected = aircraftSelect.value;
+        if (!selected || !stockData[selected]) return false;
+        
+        const parts = {
+            'KANAT': parseInt(document.getElementsByName('kanat_qty')[0].value),
+            'GOVDE': parseInt(document.getElementsByName('govde_qty')[0].value),
+            'KUYRUK': parseInt(document.getElementsByName('kuyruk_qty')[0].value),
+            'AVIYONIK': parseInt(document.getElementsByName('aviyonik_qty')[0].value)
+        };
+        
+        let insufficientParts = [];
+        for (const [partType, qty] of Object.entries(parts)) {
+            if (stockData[selected][partType] < qty) {
+                insufficientParts.push(partType.toLowerCase());
+            }
+        }
+        
+        if (insufficientParts.length > 0) {
+            alert(`Stokta yeterli ${insufficientParts.join(', ')} parçası bulunmamaktadır!`);
+            return false;
+        }
+        
+        event.target.submit();
+    }
+
+    aircraftSelect.addEventListener('change', updateStock);
+    updateStock();
+</script>
+{% endblock %}

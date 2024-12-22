@@ -1,0 +1,84 @@
+{% extends "employees/base.html" %}
+{% block title %}Parça Listesi{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Parça Listesi</h2>
+    <!-- ...existing messages display code... -->
+    
+    <div class="row mb-3">
+        <div class="col">
+            {% if user.team.responsible_part != 'MONTAJ' %}
+            <a href="{% url 'create_part' %}" class="btn btn-primary">Yeni Parça Üret</a>
+            {% endif %}
+        </div>
+        <div class="col">
+            <form method="get" class="form-inline justify-content-end">
+                <select name="aircraft_type" class="form-control mr-2" onchange="this.form.submit()">
+                    <option value="">Tüm Uçaklar</option>
+                    <option value="TB2" {% if request.GET.aircraft_type == 'TB2' %}selected{% endif %}>TB2</option>
+                    <option value="TB3" {% if request.GET.aircraft_type == 'TB3' %}selected{% endif %}>TB3</option>
+                    <option value="AKINCI" {% if request.GET.aircraft_type == 'AKINCI' %}selected{% endif %}>AKINCI</option>
+                    <option value="KIZILELMA" {% if request.GET.aircraft_type == 'KIZILELMA' %}selected{% endif %}>KIZILELMA</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Stock Summary Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Stok Durumu</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for aircraft_name, parts_stock in stock_summary.items %}
+                <div class="col-md-3 mb-3">
+                    <h6>{{ aircraft_name }}</h6>
+                    <ul class="list-unstyled">
+                        {% for part_name, quantity in parts_stock.items %}
+                            <li>{{ part_name }}: {{ quantity }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Parça Tipi</th>
+                <th>Uçak Tipi</th>
+                <th>Seri Numarası</th>
+                <th>Kullanılmış</th>
+                <th>Sil</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for part in parts %}
+                <tr>
+                    <td>{{ part.get_part_type_display }}</td>
+                    <td>{{ part.get_aircraft_type_display }}</td>
+                    <td>{{ part.serial_number }}</td>
+                    <td>
+                        {% if part.used_in_aircrafts.exists %}
+                            <span class="text-danger">Evet</span>
+                        {% else %}
+                            <span class="text-success">Hayır</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'delete_part' part.id %}">Sil</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">Henüz parça yok.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

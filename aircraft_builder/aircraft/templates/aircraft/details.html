@@ -1,0 +1,31 @@
+
+{% extends "employees/base.html" %}
+{% block title %}Uçak Detayları{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Uçak Detayları - {{ aircraft.aircraft_type }} (ID: {{ aircraft.pk }})</h2>
+        <a href="{% url 'list_aircraft' %}" class="btn btn-secondary">Geri Dön</a>
+    </div>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Parça Tipi</th>
+                <th>Seri Numarası</th>
+                <th>Üretim Tarihi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for used_part in used_parts %}
+            <tr>
+                <td>{{ used_part.part.get_part_type_display }}</td>
+                <td>{{ used_part.part.serial_number }}</td>
+                <td>{{ used_part.part.created_time|date:"d.m.Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

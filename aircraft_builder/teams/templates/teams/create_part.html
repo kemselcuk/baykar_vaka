@@ -1,0 +1,27 @@
+{% extends "employees/base.html" %}
+{% block title %}Yeni Parça Üret{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Yeni Parça Üret</h2>
+    <!-- ...existing messages display code... -->
+    <form method="post" class="card p-4">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="aircraft_type">Uçak Tipi</label>
+            <select id="aircraft_type" name="aircraft_type" class="form-control" required>
+                <option value="">Seçiniz</option>
+                <option value="TB2">TB2</option>
+                <option value="TB3">TB3</option>
+                <option value="AKINCI">AKINCI</option>
+                <option value="KIZILELMA">KIZILELMA</option>
+            </select>
+        </div>
+        <div class="form-group mb-3">
+            <label for="quantity">Miktar</label>
+            <input type="number" id="quantity" name="quantity" class="form-control" min="1" value="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Üret</button>
+    </form>
+</div>
+{% endblock %}

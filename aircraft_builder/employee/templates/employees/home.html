@@ -1,0 +1,20 @@
+{% extends 'employees/base.html' %}
+{% block title %}Ana Sayfa{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Hoş Geldiniz {{ user.username }}</h1>
+            <p>Ekibiniz: {{ user.team.name }}</p>
+        </div>
+    </div>
+</div>
+<nav class="mt-4">
+    <a href="{% url 'list_parts' %}" class="btn btn-outline-primary">Parçalar</a>
+    {% if user.team.responsible_part == 'MONTAJ' %}
+        <a href="{% url 'list_aircraft' %}" class="btn btn-outline-primary">Uçaklar</a>
+        <a href="{% url 'assemble_aircraft' %}" class="btn btn-outline-primary">Montaj</a>
+    {% endif %}
+</nav>
+{% endblock %}
