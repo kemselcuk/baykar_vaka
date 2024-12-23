@@ -11,10 +11,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
-load_dotenv()
+# Only load .env file if not running in Docker
+if not os.environ.get('DOCKER_ENV'):
+    load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'django-insecure-@7wah0&e9m+i4_8z7$q6kunqyc*_#x)8*)4j+$1ne34u6bqiio' 
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'employee',
     'rest_framework',    
     'widget_tweaks',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -86,11 +89,11 @@ WSGI_APPLICATION = 'aircraft_builder.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+        'NAME': os.environ.get('POSTGRES_DB') or os.environ.get('DB_NAME'),
+        'USER': os.environ.get('POSTGRES_USER') or os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD') or os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST') or os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT') or os.environ.get('DB_PORT'),
     }
 }
 
